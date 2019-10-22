@@ -1,0 +1,8 @@
+<div class="card" *ngFor="let blog of recentBlogPosts | async">
+  <div class="card-header">{{blog.title}}</div>
+  <div class="card-body">{{blog.text}}</div>
+  <div class="card-footer text-muted">{{blog.username}} - last modified: {{blog.modified.seconds *1000 | date}}</div>
+</div>
+<div class="card" *ngIf="!recentBlogPosts">
+  <div class="card-body">There are no posts to display.</div>
+</div>

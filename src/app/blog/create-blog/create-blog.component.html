@@ -1,0 +1,11 @@
+<form [formGroup]="blogForm" (ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <label for="title">Title</label>
+    <input type="text" class="form-control" formControlName="title">
+  </div>
+  <div class="form-group">
+    <label for="text">Title</label>
+    <textarea class="form-control" formControlName="text"></textarea>
+  </div>
+  <button class="btn btn-success">Save</button>
+</form>
