@@ -6,3 +6,7 @@
 <div class="card" *ngIf="!recentBlogPosts">
   <div class="card-body">There are no posts to display.</div>
 </div>
+<button mat-raised-button (click)="getMore()">Mehr...</button>
+<div *ngIf="auth">
+  <app-create-blog></app-create-blog>
+</div>

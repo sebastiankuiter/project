@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BlogsService } from './blogs.service';
-import { Blog } from 'src/app/model';
 import { Observable, of } from 'rxjs';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { UserService } from '../user/user.service';
 
 @Component({
   selector: 'app-blogs',
@@ -10,48 +11,30 @@ import { Observable, of } from 'rxjs';
 })
 export class BlogsComponent implements OnInit, OnDestroy {
 
-  $recentBlogs: any;
-  snapshot: any;
-  recency = 3;
-  recentBlogPosts: Promise<any>;
+  recentBlogPosts: Observable<any>;
+  auth = false;
+  lastPost: any;
+  authState: any;
 
-  constructor(private blogsServerice: BlogsService) { }
-
-  async ngOnInit() {
-    // better with paginate your data video.
-    await this.data(1);
+  constructor(
+    private blogsServerice: BlogsService,
+    private userService: UserService
+  ) {
+    this.recentBlogPosts = this.blogsServerice.getBlogs();
   }
 
-  data(snapshot?) {
-    return new Promise((resolve, reject) => {
-      this.$recentBlogs = this.blogsServerice.getNextBlogs(snapshot)
-        .onSnapshot(
-          querySnapshot => {
-            this.snapshot = querySnapshot;
-            console.log(`Received query snapshot of size ${querySnapshot.size}`);
-            console.log(querySnapshot.empty);
-            if (!querySnapshot.empty) {
-              // this.recentBlogPosts = querySnapshot.docs;
-              const array = [];
-              querySnapshot.forEach(el => {
-                array.push(el.data())
-              });
-              console.log(array);
-              this.recentBlogPosts = of(array).toPromise();
-              resolve();
-            }
-          },
-          err => { reject(err); console.error(err) }
-        )
-    })
+  ngOnInit() {
+    this.userService.isAuthenticated().subscribe(
+      (auth) => { this.auth = auth }
+    )
   }
 
-  next() {
-
+  getMore() {
+    this.recentBlogPosts = this.blogsServerice.getMore();
   }
 
   ngOnDestroy() {
-    this.$recentBlogs();
+
   }
 
 }

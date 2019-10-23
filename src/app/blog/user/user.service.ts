@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { take } from 'rxjs/operators'
+import { take, map } from 'rxjs/operators'
 import { AngularFirestore } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,14 +14,35 @@ export class UserService {
   constructor(
     private afAuth: AngularFireAuth,
     private firestore: AngularFirestore
-  ) {}
+  ) { }
 
   async saveUserData(userData) {
     // const userUID = this.afAuth.user.uid
     const state = await this.afAuth.authState.pipe(take(1)).toPromise();
     const userUID = state.uid;
-    console.log(userUID);
     return this.userRef.doc(`${userUID}_${userData.firstName}`)
       .set(userData)
+  }
+
+  async getUserData() {
+    const state = await this.afAuth.authState.pipe(
+      take(1)
+    ).toPromise();
+    return this.firestore.collection('user').doc(state.uid)
+      .get().pipe(
+        map(userRef => {
+          // console.log(userRef.data());
+          return userRef.data();
+        })
+      ).toPromise()
+  }
+
+  isAuthenticated(): Observable<boolean> {
+    return new Observable((sub) => {
+      this.afAuth.authState.subscribe((state) => {
+        if (!state) { sub.next(false) }
+        else { sub.next(true) }
+      })
+    })
   }
 }

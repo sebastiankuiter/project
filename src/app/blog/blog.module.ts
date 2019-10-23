@@ -7,7 +7,7 @@ import { CreateBlogComponent } from './create-blog/create-blog.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UserService } from './user/user.service';
 import { BlogsComponent } from './blogs/blogs.component';
-import { MatDialogModule } from '@angular/material';
+import { MatDialogModule, MatButtonModule } from '@angular/material';
 
 const routes: Routes = [
   {
@@ -26,6 +26,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forChild(routes),
     MatDialogModule,
+    MatButtonModule,
   ],
   providers: [UserService],
   entryComponents: []

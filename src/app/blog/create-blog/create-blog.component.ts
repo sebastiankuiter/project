@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BlogsService } from '../blogs/blogs.service';
 import { exhaust } from 'rxjs/operators';
+import { UserService } from '../user/user.service';
 
 @Component({
   selector: 'app-create-blog',
@@ -9,35 +10,39 @@ import { exhaust } from 'rxjs/operators';
   styleUrls: ['./create-blog.component.scss']
 })
 export class CreateBlogComponent implements OnInit {
+  blogForm: FormGroup;
+  user: any;
 
-  blogForm: FormGroup
   constructor(
     private formBuider: FormBuilder,
-    private blogService: BlogsService
+    private blogService: BlogsService,
+    private userService: UserService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.blogForm = this.formBuider.group({
       title: ['', Validators.required],
       text: ['', Validators.required]
-    })
+    });
+    this.user = await this.userService.getUserData();
+    console.log(this.user);
   }
 
   onSubmit() {
-    
     let blog = {
       created: new Date(),
       modified: new Date(),
-      userRef: '',
-      username: '',
+      username: this.user.username,
       title: this.blogForm.controls.title.value,
       text: this.blogForm.controls.text.value
     };
     this.blogService.createNewBlog(blog).pipe(exhaust())
       .subscribe(
-        (ref) => { 
+        (ref) => {
+          console.log('Sucess');
+          this.blogForm.reset();
           // success navigate away or something;
-         },
+        },
         (error) => console.error(error)
       )
   }

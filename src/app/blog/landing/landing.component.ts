@@ -11,8 +11,8 @@ export class LandingComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
-    console.log(this.activatedRoute);
-    this.activatedRoute.url.subscribe((url) => { console.log(url) })
+    // console.log(this.activatedRoute);
+    this.activatedRoute.url.subscribe((url) => {  })
   }
 
 }
