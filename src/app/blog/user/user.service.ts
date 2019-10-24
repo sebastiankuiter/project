@@ -28,6 +28,7 @@ export class UserService {
     const state = await this.afAuth.authState.pipe(
       take(1)
     ).toPromise();
+    console.log(state.uid);
     return this.firestore.collection('user').doc(state.uid)
       .get().pipe(
         map(userRef => {
