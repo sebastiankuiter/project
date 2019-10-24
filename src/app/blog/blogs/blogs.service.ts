@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { Blog } from 'src/app/model';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +11,7 @@ export class BlogsService {
 
   blogsCollection = this.firestore.collection('blogs');
   allqueriedBlogs = [];
+  lastVisible: any;
 
   constructor(
     private firestore: AngularFirestore
@@ -27,35 +28,37 @@ export class BlogsService {
   }
 
   getMore() {
+    console.log(this.lastVisible);
     const collection = this.firestore.collection('blogs', ref => ref
-      .orderBy('created', 'desc')
-      .startAfter(this.allqueriedBlogs[this.allqueriedBlogs.length - 1])
       .limit(2)
+      .orderBy('created', 'desc')
+      .startAfter(this.lastVisible)
     )
     const $blogs = collection.get()
       .pipe(
-        map(blogs => {
+        map((blogs: any) => {
           blogs.forEach(data => this.allqueriedBlogs.push(data.data()));
           console.log(this.allqueriedBlogs);
+          this.lastVisible = blogs.docs[blogs.docs.length - 1];
           return this.allqueriedBlogs;
-        })
+        }),
       )
     return $blogs
   }
 
   getBlogs() {
     const collection = this.firestore.collection('blogs', ref => ref
-      .orderBy('created', 'desc')
-      .limit(2)
+    .limit(2)
+    .orderBy('created', 'desc')
     )
-    const $user = collection.valueChanges()
+    const $blogs = collection.valueChanges()
       .pipe(
         map((blogs: any) => {
           blogs.forEach(data => this.allqueriedBlogs.push(data));
-          console.log(this.allqueriedBlogs);
+          this.lastVisible = blogs[blogs.length - 1];
           return this.allqueriedBlogs;
         })
       )
-    return $user;
+    return $blogs;
   }
 }
