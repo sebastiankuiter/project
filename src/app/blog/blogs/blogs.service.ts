@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { Blog } from 'src/app/model';
-import { map, tap } from 'rxjs/operators';
+import { map, tap, exhaustMap, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -18,13 +18,11 @@ export class BlogsService {
   ) { }
 
   createNewBlog(blog: any) {
-    return from(
-      new Promise((resolve, reject) => {
-        this.blogsCollection.add(blog)
-          .then((ref) => { resolve(ref) })
-          .catch((err) => { reject(err) })
-      })
-    )
+    return new Observable((sub) => {
+      this.blogsCollection.add(blog)
+        .then((ref) => { sub.next(ref); sub.complete() })
+        .catch((err) => { sub.error(err) })
+    });
   }
 
   getMore() {
@@ -48,12 +46,13 @@ export class BlogsService {
 
   getBlogs() {
     const collection = this.firestore.collection('blogs', ref => ref
-    .limit(2)
-    .orderBy('created', 'desc')
+      .limit(2)
+      .orderBy('created', 'desc')
     )
     const $blogs = collection.valueChanges()
       .pipe(
         map((blogs: any) => {
+          this.allqueriedBlogs = [];
           blogs.forEach(data => this.allqueriedBlogs.push(data));
           this.lastVisible = blogs[blogs.length - 1];
           return this.allqueriedBlogs;

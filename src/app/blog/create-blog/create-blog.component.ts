@@ -36,7 +36,7 @@ export class CreateBlogComponent implements OnInit {
       title: this.blogForm.controls.title.value,
       text: this.blogForm.controls.text.value
     };
-    this.blogService.createNewBlog(blog).pipe(exhaust())
+    this.blogService.createNewBlog(blog)
       .subscribe(
         (ref) => {
           console.log('Sucess');
