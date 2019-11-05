@@ -31,6 +31,7 @@ export class BlogsComponent implements OnInit, OnDestroy {
 
   getMore() {
     this.recentBlogPosts = this.blogsServerice.getMore();
+    this.blogsServerice.testSubcollectioQuery();
   }
 
   ngOnDestroy() {

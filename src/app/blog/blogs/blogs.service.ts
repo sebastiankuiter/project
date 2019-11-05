@@ -3,6 +3,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { Blog } from 'src/app/model';
 import { map, tap, exhaustMap, take } from 'rxjs/operators';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,8 @@ export class BlogsService {
   lastVisible: any;
 
   constructor(
-    private firestore: AngularFirestore
+    private firestore: AngularFirestore,
+    private afAuth: AngularFireAuth
   ) { }
 
   createNewBlog(blog: any) {
@@ -59,5 +61,13 @@ export class BlogsService {
         })
       )
     return $blogs;
+  }
+
+  testSubcollectioQuery() {
+    this.firestore.collectionGroup('secret').get()
+      .subscribe(
+        (sec) => { sec.forEach(el => console.log(el.data())) },
+        (error) => { console.log(error) }
+      )
   }
 }
